@@ -1,0 +1,212 @@
+[
+  {
+    "language": "Hindi",
+    "code": "hi",
+    "script": "Devanagari",
+    "states": ["Uttar Pradesh", "Bihar", "Madhya Pradesh", "Rajasthan", "Haryana", "Himachal Pradesh", "Delhi"],
+    "category": "Official Language"
+  },
+  {
+    "language": "English",
+    "code": "en",
+    "script": "Latin",
+    "states": ["Pan-India"],
+    "category": "Official Language"
+  },
+  {
+    "language": "Telugu",
+    "code": "te",
+    "script": "Telugu",
+    "states": ["Andhra Pradesh", "Telangana"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Tamil",
+    "code": "ta",
+    "script": "Tamil",
+    "states": ["Tamil Nadu", "Puducherry"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Kannada",
+    "code": "kn",
+    "script": "Kannada",
+    "states": ["Karnataka"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Malayalam",
+    "code": "ml",
+    "script": "Malayalam",
+    "states": ["Kerala", "Lakshadweep"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Marathi",
+    "code": "mr",
+    "script": "Devanagari",
+    "states": ["Maharashtra"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Gujarati",
+    "code": "gu",
+    "script": "Gujarati",
+    "states": ["Gujarat"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Punjabi",
+    "code": "pa",
+    "script": "Gurmukhi",
+    "states": ["Punjab", "Haryana", "Delhi"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Bengali",
+    "code": "bn",
+    "script": "Bengali",
+    "states": ["West Bengal", "Tripura", "Assam"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Odia",
+    "code": "or",
+    "script": "Odia",
+    "states": ["Odisha"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Assamese",
+    "code": "as",
+    "script": "Assamese",
+    "states": ["Assam"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Urdu",
+    "code": "ur",
+    "script": "Perso-Arabic",
+    "states": ["Telangana", "Uttar Pradesh", "Bihar", "Jammu and Kashmir", "Delhi"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Sanskrit",
+    "code": "sa",
+    "script": "Devanagari",
+    "states": ["Pan-India"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Konkani",
+    "code": "kok",
+    "script": "Devanagari",
+    "states": ["Goa", "Maharashtra", "Karnataka"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Manipuri",
+    "code": "mni",
+    "script": "Meetei Mayek",
+    "states": ["Manipur"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Bodo",
+    "code": "brx",
+    "script": "Devanagari",
+    "states": ["Assam"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Dogri",
+    "code": "doi",
+    "script": "Devanagari",
+    "states": ["Jammu and Kashmir"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Maithili",
+    "code": "mai",
+    "script": "Devanagari",
+    "states": ["Bihar", "Jharkhand"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Santali",
+    "code": "sat",
+    "script": "Ol Chiki",
+    "states": ["Jharkhand", "Odisha", "West Bengal"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Kashmiri",
+    "code": "ks",
+    "script": "Perso-Arabic",
+    "states": ["Jammu and Kashmir"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Sindhi",
+    "code": "sd",
+    "script": "Devanagari / Arabic",
+    "states": ["Pan-India"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Nepali",
+    "code": "ne",
+    "script": "Devanagari",
+    "states": ["Sikkim", "West Bengal"],
+    "category": "Official Language (Scheduled)"
+  },
+  {
+    "language": "Tulu",
+    "code": "tcy",
+    "script": "Kannada",
+    "states": ["Karnataka", "Kerala"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Haryanvi",
+    "code": "bgc",
+    "script": "Devanagari",
+    "states": ["Haryana"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Rajasthani",
+    "code": "raj",
+    "script": "Devanagari",
+    "states": ["Rajasthan"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Bhojpuri",
+    "code": "bho",
+    "script": "Devanagari",
+    "states": ["Bihar", "Uttar Pradesh"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Garhwali",
+    "code": "gbm",
+    "script": "Devanagari",
+    "states": ["Uttarakhand"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Kumaoni",
+    "code": "kfy",
+    "script": "Devanagari",
+    "states": ["Uttarakhand"],
+    "category": "Regional Language"
+  },
+  {
+    "language": "Kodava",
+    "code": "kfv",
+    "script": "Kannada",
+    "states": ["Karnataka"],
+    "category": "Regional Language"
+  }
+]

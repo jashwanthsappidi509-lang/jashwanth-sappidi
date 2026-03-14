@@ -1,0 +1,5 @@
+{
+  "name": "AgroVision: Smart Farming Analytics Platform",
+  "description": "A smart agriculture platform that helps farmers make better farming decisions using data analytics, providing crop recommendations, yield predictions, weather insights, and market prices.",
+  "requestFramePermissions": ["geolocation", "microphone", "camera"]
+}
