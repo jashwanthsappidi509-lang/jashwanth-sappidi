@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sprout, TrendingUp, CloudSun, ShoppingBag, ArrowRight, ScanLine, MessageSquare } from 'lucide-react';
+import { Sprout, TrendingUp, CloudSun, ShoppingBag, ArrowRight, ScanLine, MessageSquare, FlaskConical } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -9,53 +9,46 @@ export default function Home() {
 
   const features = [
     {
-      title: t('Crop Analysis'),
-      description: t('Upload a photo of your crop'),
-      icon: ScanLine,
-      color: 'bg-purple-100 text-purple-700',
-      path: '/analysis',
-    },
-    {
       title: t('Crop Recommendation'),
-      description: t('Get AI-powered recommendations'),
+      description: t('Random Forest powered crop selection based on soil and weather'),
       icon: Sprout,
       color: 'bg-green-100 text-green-700',
       path: '/recommendation',
     },
     {
+      title: t('Disease Detection'),
+      description: t('CNN-powered plant disease detection from leaf images'),
+      icon: ScanLine,
+      color: 'bg-emerald-100 text-emerald-700',
+      path: '/expert-assistant',
+    },
+    {
+      title: t('Fertilizer Suggestion'),
+      description: t('Decision Tree based fertilizer recommendations for optimal growth'),
+      icon: FlaskConical,
+      color: 'bg-purple-100 text-purple-700',
+      path: '/fertilizer',
+    },
+    {
       title: t('Yield Prediction'),
-      description: t('Predict your harvest yield'),
+      description: t('Regression model for accurate harvest yield forecasting'),
       icon: TrendingUp,
       color: 'bg-blue-100 text-blue-700',
       path: '/prediction',
     },
     {
       title: t('Weather Insights'),
-      description: t('Stay ahead with real-time weather updates'),
+      description: t('Real-time weather updates and agricultural advice'),
       icon: CloudSun,
       color: 'bg-yellow-100 text-yellow-700',
       path: '/weather',
     },
     {
       title: t('Market Prices'),
-      description: t('Track real-time market prices'),
+      description: t('Track real-time market prices for your crops'),
       icon: ShoppingBag,
       color: 'bg-orange-100 text-orange-700',
       path: '/market',
-    },
-    {
-      title: t('AI Crop Health & Weed Detection'),
-      description: t('Detect plant diseases and weeds using AI'),
-      icon: ScanLine,
-      color: 'bg-emerald-100 text-emerald-700',
-      path: '/health-detection',
-    },
-    {
-      title: t('AI Assistant'),
-      description: t('Ask anything about farming...'),
-      icon: MessageSquare,
-      color: 'bg-red-100 text-red-700',
-      path: '/assistant',
     },
   ];
 

@@ -1,5 +1,5 @@
 {
-  "name": "AgroVision: Smart Farming Analytics Platform",
-  "description": "A smart agriculture platform that helps farmers make better farming decisions using data analytics, providing crop recommendations, yield predictions, weather insights, and market prices.",
+  "name": "AgroVision – Smart Agriculture Assistant",
+  "description": "A complete smart agriculture assistant for farmers featuring crop information, disease detection, market prices, and fertilizer recommendations.",
   "requestFramePermissions": ["geolocation", "microphone", "camera"]
 }

@@ -9,6 +9,14 @@
 @layer base {
   body {
     @apply bg-[#F5F5F0] text-gray-900 antialiased;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  
+  input, textarea {
+    user-select: text;
   }
   
   h1, h2, h3, h4 {

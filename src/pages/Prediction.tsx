@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, Droplets, Thermometer, Wind, Sprout, Search, ArrowRight, Info } from 'lucide-react';
+import { TrendingUp, Droplets, Thermometer, Wind, Sprout, Search, ArrowRight, Info, AlertCircle } from 'lucide-react';
 import { 
   BarChart, 
   Bar, 
@@ -12,20 +12,90 @@ import {
 } from 'recharts';
 import { MOCK_YIELD_DATA } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
-
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+import { GoogleGenAI, Type } from "@google/genai";
 
 export default function Prediction() {
   const [isPredicting, setIsPredicting] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<{
+    yield: number;
+    comparison: string;
+    confidence: number;
+    historicalData: { year: number; yield: number }[];
+    insight: string;
+  } | null>(null);
 
-  const handlePredict = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    cropType: 'Wheat',
+    rainfall: '',
+    temperature: '',
+    n: '',
+    p: ''
+  });
+
+  const handlePredict = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPredicting(true);
-    setTimeout(() => {
-      setIsPredicting(false);
+    setError(null);
+    
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `You are an agricultural data scientist. Predict the harvest yield (in tons per hectare) for the following parameters:
+Crop: ${formData.cropType}
+Expected Rainfall: ${formData.rainfall} mm
+Average Temperature: ${formData.temperature} °C
+Nitrogen (N): ${formData.n} mg/kg
+Phosphorus (P): ${formData.p} mg/kg
+
+Provide a realistic yield prediction, a comparison percentage vs last year, a confidence level, and 5 years of realistic historical data for this crop in similar conditions.
+Return the results in JSON format.`,
+              },
+            ],
+          },
+        ],
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              yield: { type: Type.NUMBER },
+              comparison: { type: Type.STRING },
+              confidence: { type: Type.NUMBER },
+              historicalData: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    year: { type: Type.NUMBER },
+                    yield: { type: Type.NUMBER }
+                  },
+                  required: ['year', 'yield']
+                }
+              },
+              insight: { type: Type.STRING }
+            },
+            required: ['yield', 'comparison', 'confidence', 'historicalData', 'insight']
+          }
+        }
+      });
+
+      const result = JSON.parse(response.text);
+      setPrediction(result);
       setShowResult(true);
-    }, 1500);
+    } catch (err) {
+      console.error('Prediction error:', err);
+      setError('Failed to calculate prediction. Please check your inputs.');
+    } finally {
+      setIsPredicting(false);
+    }
   };
 
   return (
@@ -48,7 +118,11 @@ export default function Prediction() {
                 <Sprout size={16} className="mr-2 text-blue-600" />
                 Crop Type
               </label>
-              <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white">
+              <select 
+                value={formData.cropType}
+                onChange={(e) => setFormData({ ...formData, cropType: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white"
+              >
                 <option>Wheat</option>
                 <option>Rice</option>
                 <option>Maize</option>
@@ -64,6 +138,8 @@ export default function Prediction() {
               </label>
               <input 
                 type="number" 
+                value={formData.rainfall}
+                onChange={(e) => setFormData({ ...formData, rainfall: e.target.value })}
                 placeholder="e.g., 120"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 required
@@ -77,6 +153,8 @@ export default function Prediction() {
               </label>
               <input 
                 type="number" 
+                value={formData.temperature}
+                onChange={(e) => setFormData({ ...formData, temperature: e.target.value })}
                 placeholder="e.g., 28"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 required
@@ -86,11 +164,23 @@ export default function Prediction() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Nitrogen (N)</label>
-                <input type="number" placeholder="mg/kg" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input 
+                  type="number" 
+                  value={formData.n}
+                  onChange={(e) => setFormData({ ...formData, n: e.target.value })}
+                  placeholder="mg/kg" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" 
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phosphorus (P)</label>
-                <input type="number" placeholder="mg/kg" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input 
+                  type="number" 
+                  value={formData.p}
+                  onChange={(e) => setFormData({ ...formData, p: e.target.value })}
+                  placeholder="mg/kg" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" 
+                />
               </div>
             </div>
 
@@ -112,6 +202,13 @@ export default function Prediction() {
               )}
             </button>
           </form>
+
+          {error && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 text-red-600">
+              <AlertCircle size={20} className="shrink-0 mt-0.5" />
+              <p className="text-sm font-medium">{error}</p>
+            </div>
+          )}
         </div>
 
         {/* Results Section */}
@@ -149,7 +246,7 @@ export default function Prediction() {
               </motion.div>
             )}
 
-            {showResult && (
+            {showResult && prediction && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -164,29 +261,40 @@ export default function Prediction() {
                       <span className="bg-white/20 px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-medium backdrop-blur-sm">2024 Season</span>
                     </div>
                     <div className="flex items-baseline space-x-2 md:space-x-4">
-                      <span className="text-5xl md:text-7xl font-bold tracking-tighter">3.45</span>
+                      <span className="text-5xl md:text-7xl font-bold tracking-tighter">{prediction.yield}</span>
                       <span className="text-lg md:text-2xl text-white/70 font-medium">tons / hectare</span>
                     </div>
                     <div className="mt-6 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-white/80 text-sm">
                       <div className="flex items-center">
                         <TrendingUp size={16} className="mr-2 text-green-400" />
-                        <span>+12% vs last year</span>
+                        <span>{prediction.comparison} vs last year</span>
                       </div>
                       <div className="hidden sm:block w-1 h-1 bg-white/30 rounded-full"></div>
                       <div className="flex items-center">
                         <Info size={16} className="mr-2" />
-                        <span>95% Confidence Interval</span>
+                        <span>{prediction.confidence}% Confidence Interval</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                {/* Insight Card */}
+                <div className="bg-white p-6 rounded-3xl border border-gray-100 flex items-start gap-4">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
+                    <Info size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">AI Insight</h4>
+                    <p className="text-gray-600 text-sm mt-1 leading-relaxed">{prediction.insight}</p>
+                  </div>
+                </div>
+
                 {/* Historical Comparison */}
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-900 mb-8">Yield Comparison (2019 - 2024)</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-8">Yield Comparison (Historical)</h3>
                   <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={[...MOCK_YIELD_DATA, { year: 2024, yield: 3.45 }]}>
+                      <BarChart data={prediction.historicalData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                         <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dy={10} />
                         <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dx={-10} />
@@ -195,7 +303,7 @@ export default function Prediction() {
                           contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                         />
                         <Bar dataKey="yield" radius={[8, 8, 0, 0]}>
-                          {[...MOCK_YIELD_DATA, { year: 2024, yield: 3.45 }].map((entry, index) => (
+                          {prediction.historicalData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.year === 2024 ? '#3b82f6' : '#e5e7eb'} />
                           ))}
                         </Bar>

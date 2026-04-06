@@ -7,12 +7,12 @@ export default function Profile() {
   const { user, logout, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
+    displayName: user?.displayName || '',
     location: user?.location || '',
     farmSize: user?.farmSize || '',
     soilType: user?.soilType || '',
     currentCrops: user?.currentCrops || '',
-    profilePicture: user?.profilePicture || '',
+    photoURL: user?.photoURL || '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,10 +25,10 @@ export default function Profile() {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        setFormData(prev => ({ ...prev, profilePicture: base64String }));
+        setFormData(prev => ({ ...prev, photoURL: base64String }));
         // Automatically save if not in editing mode, or just update the preview
         if (!isEditing) {
-          updateProfile({ ...formData, profilePicture: base64String });
+          updateProfile({ ...formData, photoURL: base64String });
         }
       };
       reader.readAsDataURL(file);
@@ -105,16 +105,16 @@ export default function Profile() {
               className="hidden" 
               accept="image/*"
             />
-            {formData.profilePicture || user.profilePicture ? (
+            {formData.photoURL || user.photoURL ? (
               <img 
-                src={formData.profilePicture || user.profilePicture} 
-                alt={user.name} 
+                src={formData.photoURL || user.photoURL || ''} 
+                alt={user.displayName || ''} 
                 className="w-32 h-32 rounded-[40px] object-cover border-4 border-white shadow-xl"
                 referrerPolicy="no-referrer"
               />
             ) : (
               <div className="w-32 h-32 bg-green-100 rounded-[40px] flex items-center justify-center text-green-600 text-4xl font-bold border-4 border-white shadow-xl">
-                {user.name?.[0] || 'F'}
+                {user.displayName?.[0] || 'F'}
               </div>
             )}
             <button 
@@ -125,14 +125,14 @@ export default function Profile() {
             </button>
           </div>
           
-          <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{user.displayName}</h2>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">Verified Farmer</p>
           
           <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400 font-medium">Member Since</span>
               <span className="text-gray-900 font-bold">
-                {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'March 2024'}
+                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'March 2024'}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
@@ -164,12 +164,12 @@ export default function Profile() {
                 {isEditing ? (
                   <input 
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    value={formData.displayName}
+                    onChange={(e) => setFormData({...formData, displayName: e.target.value})}
                     className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 font-bold"
                   />
                 ) : (
-                  <p className="text-gray-900 font-bold text-lg">{user.name}</p>
+                  <p className="text-gray-900 font-bold text-lg">{user.displayName}</p>
                 )}
               </div>
 

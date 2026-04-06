@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
-import { GoogleGenAI, Type } from "@google/genai";
+import { detectDisease, analyzeWeeds } from '../services/gemini';
 
 interface DiseaseAnalysis {
   diseaseName: string;
@@ -72,104 +72,13 @@ export default function CropHealthWeedDetection() {
     setWeedResult(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       const base64Data = selectedImage.split(',')[1];
 
       if (activeTab === 'disease') {
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash-preview",
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  inlineData: {
-                    data: base64Data,
-                    mimeType: "image/jpeg",
-                  },
-                },
-                {
-                  text: `Analyze this plant leaf image for diseases. 
-                  Possible classes: Leaf Spot, Powdery Mildew, Leaf Mold, Spider Mites, Bean Rust.
-                  Return JSON with:
-                  - diseaseName: string
-                  - severity: "Low" | "Moderate" | "High"
-                  - recommendation: string
-                  - confidence: number (0-1)
-                  `,
-                },
-              ],
-            },
-          ],
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                diseaseName: { type: Type.STRING },
-                severity: { type: Type.STRING, enum: ['Low', 'Moderate', 'High'] },
-                recommendation: { type: Type.STRING },
-                confidence: { type: Type.NUMBER },
-              },
-              required: ['diseaseName', 'severity', 'recommendation', 'confidence']
-            }
-          }
-        });
-
-        const result = JSON.parse(response.text);
+        const result = await detectDisease(base64Data);
         setAnalysisResult(result);
       } else {
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash-preview",
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  inlineData: {
-                    data: base64Data,
-                    mimeType: "image/jpeg",
-                  },
-                },
-                {
-                  text: `Detect weeds in this crop field image. 
-                  Return JSON with:
-                  - totalWeeds: number
-                  - suggestedAction: "Manual removal" | "Use targeted herbicide"
-                  - weeds: array of objects with { label: string, box_2d: [ymin, xmin, ymax, xmax] }
-                  `,
-                },
-              ],
-            },
-          ],
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                totalWeeds: { type: Type.NUMBER },
-                suggestedAction: { type: Type.STRING },
-                weeds: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      label: { type: Type.STRING },
-                      box_2d: {
-                        type: Type.ARRAY,
-                        items: { type: Type.NUMBER }
-                      }
-                    },
-                    required: ['label', 'box_2d']
-                  }
-                }
-              },
-              required: ['totalWeeds', 'suggestedAction', 'weeds']
-            }
-          }
-        });
-
-        const result = JSON.parse(response.text);
+        const result = await analyzeWeeds(base64Data);
         setWeedResult(result);
       }
     } catch (error) {

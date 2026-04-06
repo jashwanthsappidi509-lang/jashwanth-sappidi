@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronRight,
   MessageSquare,
-  ScanLine
+  ScanLine,
+  FlaskConical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
@@ -30,12 +31,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { name: t('Home'), path: '/', icon: Home },
     { name: t('Dashboard'), path: '/dashboard', icon: LayoutDashboard },
+    { name: t('Crop Information'), path: '/crops', icon: Sprout },
     { name: t('Crop Analysis'), path: '/analysis', icon: ScanLine },
     { name: t('Crop Recommendation'), path: '/recommendation', icon: Sprout },
+    { name: t('Fertilizer Suggestion'), path: '/fertilizer', icon: FlaskConical },
     { name: t('Yield Prediction'), path: '/prediction', icon: TrendingUp },
     { name: t('Market Prices'), path: '/market', icon: ShoppingBag },
     { name: t('Weather Insights'), path: '/weather', icon: CloudSun },
-    { name: t('AI Assistant'), path: '/assistant', icon: MessageSquare },
+    { name: t('Expert AI Assistant'), path: '/expert-assistant', icon: MessageSquare },
   ];
 
   const handleLogout = () => {
@@ -94,21 +97,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="p-4 border-t border-gray-50">
         {user ? (
           <div className={`flex items-center ${(isSidebarOpen || mobile) ? 'p-3' : 'justify-center'} rounded-2xl bg-gray-50/50`}>
-            {user.profilePicture ? (
+            {user.photoURL ? (
               <img 
-                src={user.profilePicture} 
-                alt={user.name} 
+                src={user.photoURL} 
+                alt={user.displayName || ''} 
                 className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm"
                 referrerPolicy="no-referrer"
               />
             ) : (
               <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 font-bold border-2 border-white shadow-sm">
-                {user.name?.[0] || 'F'}
+                {user.displayName?.[0] || 'F'}
               </div>
             )}
             {(isSidebarOpen || mobile) && (
               <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
+                <p className="text-sm font-bold text-gray-900 truncate">{user.displayName}</p>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate">{t('Farmer')}</p>
               </div>
             )}
@@ -232,19 +235,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {user && (
               <Link to="/profile" className="flex items-center space-x-3 group">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-gray-900 group-hover:text-green-600 transition-colors">{user.name}</p>
+                  <p className="text-sm font-bold text-gray-900 group-hover:text-green-600 transition-colors">{user.displayName}</p>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('Farmer')}</p>
                 </div>
-                {user.profilePicture ? (
+                {user.photoURL ? (
                   <img 
-                    src={user.profilePicture} 
-                    alt={user.name} 
+                    src={user.photoURL} 
+                    alt={user.displayName || ''} 
                     className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-md group-hover:scale-105 transition-transform"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
                   <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 font-bold border-2 border-white shadow-md group-hover:scale-105 transition-transform">
-                    {user.name?.[0] || 'F'}
+                    {user.displayName?.[0] || 'F'}
                   </div>
                 )}
               </Link>

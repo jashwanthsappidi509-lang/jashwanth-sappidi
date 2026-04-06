@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile information and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "language": { "type": "string", "enum": ["en", "hi", "te"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Crop": {
+      "title": "Crop Information",
+      "description": "Details about various crops grown in India.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "season": { "type": "string" },
+        "soil": { "type": "string" },
+        "temperature": { "type": "string" },
+        "irrigation": { "type": "string" },
+        "image": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "category"]
+    },
+    "MarketPrice": {
+      "title": "Market Price",
+      "description": "Real-time market prices for crops.",
+      "type": "object",
+      "properties": {
+        "crop": { "type": "string" },
+        "state": { "type": "string" },
+        "mandi": { "type": "string" },
+        "price": { "type": "number" },
+        "unit": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["crop", "state", "price"]
+    },
+    "DiseaseReport": {
+      "title": "Disease Analysis Report",
+      "description": "Stores results of crop disease detection.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "cropName": { "type": "string" },
+        "diseaseName": { "type": "string" },
+        "confidence": { "type": "number" },
+        "description": { "type": "string" },
+        "treatment": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "diseaseName"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/crops/{cropId}": {
+      "schema": "Crop",
+      "description": "Public crop information library."
+    },
+    "/market_prices/{priceId}": {
+      "schema": "MarketPrice",
+      "description": "Current market price data."
+    },
+    "/disease_reports/{reportId}": {
+      "schema": "DiseaseReport",
+      "description": "User-specific disease detection history."
+    }
+  }
+}

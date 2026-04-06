@@ -18,10 +18,9 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { analyzeCropHealth } from '../services/gemini';
 import VoiceTranscriber from '../components/VoiceTranscriber';
 import { useLanguage } from '../context/LanguageContext';
-
 import { api } from '../services/api';
 
 interface FertilizerRecommendation {
@@ -74,82 +73,9 @@ export default function CropAnalysis() {
     setError(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const base64Data = selectedImage.split(',')[1];
+      const result = await analyzeCropHealth(base64Data, voiceNotes, language);
       
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  data: base64Data,
-                  mimeType: "image/jpeg",
-                },
-              },
-              {
-                text: `You are an expert agricultural assistant. Analyze this crop image carefully.
-                Additional context from the farmer (voice notes): "${voiceNotes}"
-                
-                IMPORTANT: Provide the response in ${language === 'hi' ? 'Hindi' : language === 'te' ? 'Telugu' : 'English'}.
-                
-                Provide:
-1. Crop/plant name (if identifiable, otherwise say "Crop not clearly identifiable from the image.")
-2. Plant health condition (MUST be exactly "Healthy" or "Unhealthy" in English for the logic to work, but all other text should be in ${language === 'hi' ? 'Hindi' : language === 'te' ? 'Telugu' : 'English'})
-3. Possible disease or pest infection (if visible, otherwise say "No disease visible")
-4. Visible symptoms (yellow leaves, brown spots, holes, wilting, etc.)
-5. Possible cause of the problem
-6. Recommended treatment (organic and chemical solutions)
-7. Preventive measures farmers can take
-
-Keep the explanation simple and practical for farmers. Return the analysis in JSON format.`,
-              },
-            ],
-          },
-        ],
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              plantName: { type: Type.STRING },
-              healthStatus: { 
-                type: Type.STRING,
-                enum: ['Healthy', 'Unhealthy']
-              },
-              disease: { type: Type.STRING, nullable: true },
-              symptoms: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-              },
-              cause: { type: Type.STRING, nullable: true },
-              treatment: {
-                type: Type.OBJECT,
-                properties: {
-                  organic: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  },
-                  chemical: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  }
-                },
-                required: ['organic', 'chemical']
-              },
-              prevention: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-              }
-            },
-            required: ['plantName', 'healthStatus', 'disease', 'symptoms', 'cause', 'treatment', 'prevention']
-          }
-        }
-      });
-
-      const result = JSON.parse(response.text);
       setAnalysis(result);
 
       // Fetch fertilizer recommendations if unhealthy and cause mentions nutrients

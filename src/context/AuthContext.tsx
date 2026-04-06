@@ -1,16 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api } from '../services/api';
+import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db, signInWithGoogle } from '../services/firebase';
 
 interface User {
-  id: number;
-  name: string;
-  email: string;
-  profilePicture?: string;
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
   location?: string;
   farmSize?: string;
   soilType?: string;
   currentCrops?: string;
-  created_at?: string;
+  language?: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -18,7 +21,7 @@ interface AuthContextType {
   loading: boolean;
   login: (data: any) => Promise<void>;
   register: (data: any) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
 }
@@ -30,73 +33,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const userData = await api.getProfile();
-          setUser(userData);
-        } catch (error) {
-          console.error('Auth initialization failed:', error);
-          localStorage.removeItem('token');
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          setUser(userDoc.data() as User);
+        } else {
+          // Fallback if doc doesn't exist yet
+          setUser({
+            uid: firebaseUser.uid,
+            displayName: firebaseUser.displayName,
+            email: firebaseUser.email,
+            photoURL: firebaseUser.photoURL,
+          });
         }
+      } else {
+        setUser(null);
       }
       setLoading(false);
-    };
+    });
 
-    initAuth();
-
-    // Listen for OAuth messages
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        const { token, user: userData } = event.data;
-        localStorage.setItem('token', token);
-        setUser(userData);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    return () => unsubscribe();
   }, []);
 
   const login = async (data: any) => {
-    const res = await api.login(data);
-    if (res.user) {
-      setUser(res.user);
-    }
+    // For simplicity, we'll focus on Google Login as requested, 
+    // but we could implement email/password here too.
+    throw new Error('Please use Google Login for this demo.');
   };
 
   const register = async (data: any) => {
-    await api.register(data);
+    throw new Error('Please use Google Login for this demo.');
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
   };
 
   const loginWithGoogle = async () => {
-    try {
-      const { url } = await api.getGoogleAuthUrl();
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      window.open(
-        url,
-        'google_oauth',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-    } catch (error: any) {
-      console.error('Failed to start Google OAuth:', error);
-      throw error;
+    const firebaseUser = await signInWithGoogle();
+    
+    const userRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      setUser(userDoc.data() as User);
+    } else {
+      // This case should be handled by firebase.ts, but as a safety:
+      const newUser: User = {
+        uid: firebaseUser.uid,
+        displayName: firebaseUser.displayName,
+        email: firebaseUser.email,
+        photoURL: firebaseUser.photoURL,
+        createdAt: new Date().toISOString(),
+        language: 'en',
+      };
+      setUser(newUser);
     }
   };
 
   const updateProfile = async (data: any) => {
-    const updatedUser = await api.updateProfile(data);
-    setUser(updatedUser);
+    if (!user) return;
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, { ...user, ...data }, { merge: true });
+    setUser({ ...user, ...data });
   };
 
   return (
